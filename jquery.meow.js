@@ -70,10 +70,25 @@
       if (typeof options.icon === 'string') {
         this.icon = options.icon;
       }
+      if (typeof options.class === 'string') {
+        this.class = options.class;
+      }
+      if (typeof options.url === 'string') {
+        this.url = options.url;
+      }
       if (options.sticky) {
         this.duration = Infinity;
       } else {
         this.duration = options.duration || 5000;
+      }
+      if (options.delay) {
+        this.delay = options.delay;
+      } else {
+        this.delay = 0;
+      }
+      // Adds delay to duration so specified duration works as expected
+      if (this.delay != 0) {
+        this.duration += this.delay;
       }
 
       // Call callback if it's defined (this = meow object)
@@ -87,6 +102,7 @@
         .addClass('meow')
         .html($(window.document.createElement('div')).addClass('inner').html(this.message))
         .hide()
+        .delay(this.delay)
         .fadeIn(400));
 
       this.manifest = $('#meow-' + this.timestamp.toString());
@@ -106,6 +122,16 @@
           )
         );
       }
+      
+      // Add class if it's defined
+      if (typeof that.class === 'string') {
+        this.manifest.find('.inner').addClass('hasclass ' + this.class)
+      }
+      
+      // Add url if it's defined
+      if (typeof that.url === 'string') {
+        this.manifest.find('.inner').addClass('hasurl').attr('onclick', 'window.open("'+this.url+'")')
+      }
 
       // Add close button if the meow isn't uncloseable
       // TODO: this close button needs to be much prettier
@@ -118,6 +144,7 @@
             .click(function (e) {
               e.preventDefault();
               that.destroy();
+              e.stopPropagation();	// Stops url being called by close
             })
         );
       }
